@@ -2,24 +2,26 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define LENGTH 12
+#define LENGTH 15
 
 int main(void)
 {
     char password[LENGTH + 1];
-    int i, sum, diff;
+    int i, sum, randomChar;
 
     srand(time(0));
+    sum = 0;
 
-    for (i = 0, sum = 0; sum < 2772 - 128; i++)
+    for (i = 0; sum < 2772 - 127; i++)
     {
-        password[i] = rand() % 94 + 32;
+        randomChar = rand() % 126;
+        if (randomChar < 33)
+            randomChar += 33;
+        password[i] = randomChar;
         sum += password[i];
     }
 
-    diff = 2772 - sum;
-    password[i] = diff;
-
+    password[i] = 2772 - sum;
     password[i + 1] = '\0';
 
     printf("%s\n", password);
