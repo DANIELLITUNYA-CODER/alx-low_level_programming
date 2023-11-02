@@ -1,87 +1,77 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
+/**
+ * _putchar - writes the character c to stdout
+ * @c: The character to print
+ *
+ * Return: On success 1.
+ * On error, -1 is returned, and errno is set appropriately.
+ */
 int _putchar(char c)
 {
-    return putchar(c);
+	return (write(1, &c, 1));
 }
 
-int _isdigit(int c)
-{
-    return c >= '0' && c <= '9';
-}
-
-int _strlen(char *s)
-{
-    int len = 0;
-    while (s[len] != '\0')
-        len++;
-    return len;
-}
-
-void print_error(void)
-{
-    printf("Error\n");
-    exit(98);
-}
-
-void check_digits(char *s)
-{
-    int i = 0;
-    while (s[i])
-    {
-        if (!_isdigit(s[i]))
-            print_error();
-        i++;
-    }
-}
-
-void multiply(char *num1, char *num2)
-{
-    int len1 = _strlen(num1);
-    int len2 = _strlen(num2);
-    int *result = calloc(len1 + len2, sizeof(int));
-    if (!result)
-        print_error();
-
-    for (int i = len1 - 1; i >= 0; i--)
-    {
-        for (int j = len2 - 1; j >= 0; j--)
-        {
-            int digit1 = num1[i] - '0';
-            int digit2 = num2[j] - '0';
-            int sum = digit1 * digit2 + result[i + j + 1];
-            result[i + j] += sum / 10;
-            result[i + j + 1] = sum % 10;
-        }
-    }
-
-    int i = 0;
-    while (i < len1 + len2 && result[i] == 0)
-        i++;
-
-    if (i == len1 + len2)
-        putchar('0');
-
-    while (i < len1 + len2)
-    {
-        _putchar(result[i] + '0');
-        i++;
-    }
-    _putchar('\n');
-
-    free(result);
-}
-
+/**
+ * main - multiplies two positive numbers
+ * @argc: The number of command line arguments
+ * @argv: An array containing the program command line arguments
+ *
+ * Return: 0 on success, 98 on incorrect number of arguments, 1 on non-digit inputs.
+ */
 int main(int argc, char *argv[])
 {
-    if (argc != 3)
-        print_error();
+	int len1, len2, i, j, *result;
+	
+	if (argc != 3)
+	{
+		printf("Error\n");
+		return (98);
+	}
+	for (i = 0; argv[1][i] != '\0'; i++)
+		if (argv[1][i] < '0' || argv[1][i] > '9')
+		{
+			printf("Error\n");
+			return (98);
+		}
+	for (j = 0; argv[2][j] != '\0'; j++)
+		if (argv[2][j] < '0' || argv[2][j] > '9')
+		{
+			printf("Error\n");
+			return (98);
+		}
 
-    check_digits(argv[1]);
-    check_digits(argv[2]);
+	len1 = i;
+	len2 = j;
+	result = calloc(len1 + len2, sizeof(*result));
 
-    multiply(argv[1], argv[2]);
+	if (result == NULL)
+	{
+		printf("Error\n");
+		return (98);
+	}
 
-    return 0;
+	for (i = len1 - 1; i >= 0; i--)
+		for (j = len2 - 1; j >= 0; j--)
+			result[i + j + 1] += (argv[1][i] - '0') * (argv[2][j] - '0');
+
+	for (i = len1 + len2 - 1; i > 0; i--)
+	{
+		result[i - 1] += result[i] / 10;
+		result[i] %= 10;
+	}
+
+	if (result[0] == 0)
+		i = 1;
+	else
+		i = 0;
+
+	for (; i < len1 + len2; i++)
+		_putchar(result[i] + '0');
+	_putchar('\n');
+
+	free(result);
+	return (0);
 }
